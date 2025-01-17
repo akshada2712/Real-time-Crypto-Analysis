@@ -12,9 +12,10 @@ class CryptoDashboard:
         self.api = CoinbaseAPI()
 
     def get_optimal_granularity(self, days):
-        if days <= 3:
-            return 900  
-        elif days <= 7:
+
+        if days == 1:
+            return 900
+        elif days <= 3:
             return 3600  
         elif days <= 14:
             return 21600 
