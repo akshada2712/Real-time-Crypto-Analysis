@@ -13,8 +13,8 @@ class LiveCryptoDashboard:
     def __init__(self):
         self.api = CoinbaseAPI()
         load_dotenv()
-        self.supabase_url = os.getenv("SUPABASE_URL")
-        self.supabase_key = os.getenv("SUPABASE_KEY")
+        self.supabase_url = st.secrets["SUPABASE_URL"]
+        self.supabase_key = st.secrets["SUPABASE_KEY"]
         self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
 
     def get_last_database_timestamp(self, product_id):
