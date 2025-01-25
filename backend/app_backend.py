@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from datetime import datetime, timedelta, timezone
 import pandas as pd
 from supabase import create_client, Client
-from data_fetcher import CoinbaseAPI
+from backend.data_fetcher import CoinbaseAPI
 from dotenv import load_dotenv
 import os
 
