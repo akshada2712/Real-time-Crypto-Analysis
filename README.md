@@ -4,12 +4,14 @@ The **Real-Time Crypto Dashboard** is a dynamic cryptocurrency analysis tool tha
 
 ## Features
 
-- **Candlestick Chart**: Visualizes historical price data, showing open, high, low, and close prices alongside trading volume.
-- **Prediction Chart**: Displays price forecasts generated using LSTM models, helping users anticipate market trends.
+- **Candlestick Chart**: Visualizes historical price trends with open, high, low, and close prices, accompanied by trading volume.
+- **Prediction Chart**: Forecasts future prices using LSTM models, offering insights into market trends.
 - **Technical Indicators**:
-  - **Exponential Moving Average (EMA)**: For 20 days.
-  - **Simple Moving Average (SMA)**: For 20 days.
-  - **Other Features**: High, low, open, close prices, and volume.
+  - **Exponential Moving Average (EMA)**: Calculated over 20 days for trend analysis.
+  - **Simple Moving Average (SMA)**: Computed over 20 days for price movement insights.
+  - **Additional Features**: Includes key metrics like high, low, open, close prices, and volume for comprehensive analysis.
+- **Year-over-Year (YoY) Change**: Highlights the percentage change in price compared to the same time last year, offering a long-term perspective on market trends.
+- **Month-over-Month (MoM) Change**: Tracks the percentage change in price compared to the same time last month, providing insights into recent price movements.
 - **Note**: Timezone is in UTC.
 ## Folder Structure
 
