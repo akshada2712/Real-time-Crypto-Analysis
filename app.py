@@ -84,7 +84,7 @@ class LiveCryptoDashboard:
                 name='Testing Data', 
                 line=dict(color='blue'),
                 marker=dict(symbol='circle', size=6),
-                hovertemplate="<b>Time:</b> %{x}<br><b>Price:</b> %{y:.2f}<extra></extra>"
+                hovertemplate="<b>Time:</b> %{x}<br><b>Actual Price:</b> %{y:.2f}<extra></extra>"
             )
         )
 
