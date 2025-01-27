@@ -220,6 +220,21 @@ class LiveCryptoDashboard:
         metrics_placeholder = st.empty()
         chart_selection_placeholder = st.empty()
         visualization_placeholder = st.empty()
+
+        st.markdown(
+        """
+        <style>
+        .last-updated {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: gray;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
         last_updated_placeholder = st.empty()
 
         while True: 
@@ -249,19 +264,21 @@ class LiveCryptoDashboard:
                             st.metric("EMA20", f"${latest['EMA20']:.2f}")
 
                     tab1, tab2 = st.tabs(["📈 Candlestick Chart", "🔮 Prediction Chart"])
-
+                    timestamp_key = int(time.time()) 
                     # Tab 1: Candlestick Chart
                     with tab1:
                         candlestick_chart = self.create_candlestick_chart(historical_df, selected_pair)
-                        st.plotly_chart(candlestick_chart, use_container_width=True)  # Use `st.plotly_chart` directly for this tab
+                        st.plotly_chart(candlestick_chart, use_container_width=True, key=f"candlestick_chart_{timestamp_key}")  # Use `st.plotly_chart` directly for this tab
 
                     # Tab 2: Prediction Chart
                     with tab2:
                         pred_chart = self.predictions_chart(historical_df, prediction_df, selected_pair)
-                        st.plotly_chart(pred_chart, use_container_width=True)  # Use `st.plotly_chart` directly for this tab
+                        st.plotly_chart(pred_chart, use_container_width=True, key=f"prediction_chart_{timestamp_key}")  # Use `st.plotly_chart` directly for this tab
                  
-                    last_updated_placeholder.text(f"Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-
+                    last_updated_placeholder.markdown(
+                    f"<div class='last-updated'>Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>",
+                    unsafe_allow_html=True
+                )
                 time.sleep(60)
 
             except Exception as e:
