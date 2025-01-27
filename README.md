@@ -88,9 +88,9 @@ This evaluation highlights the effectiveness of the LSTM model in capturing pric
 
 ## Dashboard
 
-### **1. Real-Time Metrics Chart **
+### **1. Real-Time Metrics Chart**
 
-<img width="1465" alt="Screenshot 2025-01-27 at 11 42 09 AM" src="https://github.com/user-attachments/assets/86854b5d-338c-499f-bf37-1d429c580cb2" />
+<img width="1448" alt="Screenshot 2025-01-27 at 12 17 33 PM" src="https://github.com/user-attachments/assets/5dca78d8-d659-458c-bc16-b033f998e791" />
 
 This Metrics Chart provides an overview of **real-time cryptocurrency metrics**, offering key insights into the selected trading pair:
 
