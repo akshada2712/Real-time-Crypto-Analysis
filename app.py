@@ -295,7 +295,7 @@ class LiveCryptoDashboard:
                             yoy_change = (((latest['close'] - year_ago_price) / year_ago_price) * 100 if year_ago_price else None )
                             mom_change = (((latest['close'] - month_ago_price) / month_ago_price) * 100 if month_ago_price else None)
                             st.markdown("### Price & Volume Metrics")
-                            col1, col2, col3, col4 = st.columns(4)
+                            col1, col2, col3= st.columns(3)
                             
                             # Current Price
                             col1.metric(
@@ -321,13 +321,13 @@ class LiveCryptoDashboard:
                                 help="The price difference between the highest and lowest value today."
                             )
                             
-                            # Daily Change
-                            col4.metric(
-                                "📊 24h Change",
-                                f"${ticker_data['price']:.2f}",
-                                f"{((ticker_data['price'] - latest['open']) / latest['open']) * 100:.2f}%",
-                                help="Price change in the last 24 hours."
-                            )
+                            # # Daily Change
+                            # col4.metric(
+                            #     "📊 24h Change",
+                            #     f"${ticker_data['price']:.2f}",
+                            #     f"{((ticker_data['price'] - latest['open']) / latest['open']) * 100:.2f}%",
+                            #     help="Price change in the last 24 hours."
+                            # )
                             
                             # Add some spacing between rows
                             st.markdown("<br>", unsafe_allow_html=True)
@@ -356,9 +356,9 @@ class LiveCryptoDashboard:
                             if year_ago_price is not None:
                                 col3.metric(
                                     "📅 YoY Change",
-                                    f"${ticker_data['price']:.2f}",
+                                    f"${year_ago_price:.2f}",
                                     f"{yoy_change:+.2f}%",
-                                    help=f"Year over Year change. Price one year ago: ${year_ago_price:.2f}"
+                                    help=f"Year over Year change. Price today: ${ticker_data['price']:.2f}"
                                 )
                             else:
                                 col3.metric(
@@ -372,9 +372,9 @@ class LiveCryptoDashboard:
                             if month_ago_price is not None:
                                 col4.metric(
                                     "📅 MoM Change",
-                                    f"${ticker_data['price']:.2f}",
+                                    f"${month_ago_price:.2f}",
                                     f"{mom_change:+.2f}%",
-                                    help=f"Month over Month change. Price one month ago: ${month_ago_price:.2f}"
+                                    help=f"Month over Month change. Price today: ${ticker_data['price']:.2f}"
                                 )
                             else:
                                 col4.metric(
