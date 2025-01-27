@@ -134,6 +134,93 @@ class LiveCryptoDashboard:
 
         return fig
     
+    def calculate_yoy_mom_changes(self, product_id):
+        """Calculate Year-over-Year and Month-over-Month changes."""
+        end_time = datetime.now(timezone.utc)
+        one_year_ago = end_time - timedelta(days=365)
+        one_month_ago = end_time - timedelta(days=30)
+
+        # Query for the closest record to one year ago
+        year_ago_query = (
+            self.supabase.table('coinbase_data')
+            .select('*')
+            .eq('product_id', product_id)
+            .lte('time', one_year_ago.isoformat())
+            .order('time', desc=True)
+            .limit(1)
+            .execute()
+        )
+        year_ago_price = (
+            year_ago_query.data[0]['close'] if year_ago_query.data else None
+        )
+
+        # Query for the closest record to one month ago
+        month_ago_query = (
+            self.supabase.table('coinbase_data')
+            .select('*')
+            .eq('product_id', product_id)
+            .lte('time', one_month_ago.isoformat())
+            .order('time', desc=True)
+            .limit(1)
+            .execute()
+        )
+        month_ago_price = (
+            month_ago_query.data[0]['close'] if month_ago_query.data else None
+        )
+
+        #print(f"Current Price: {current_price}")
+        print(f"Year Ago Price: {year_ago_price}")
+        print(f"Month Ago Price: {month_ago_price}")
+
+        return year_ago_price, month_ago_price
+            
+        # end_time = datetime.now(timezone.utc)
+        # start_time = end_time - timedelta(days=400)  # Get more than a year of data
+        
+        # query = (
+        #     self.supabase.table('coinbase_data')
+        #     .select('*')
+        #     .eq('product_id', product_id)
+        #     .gte('time', start_time.isoformat())
+        #     .lte('time', end_time.isoformat())
+        #     .order('time')
+        #     .execute()
+        # )
+        
+        # if not query.data:
+        #     return None, None, None, None
+        
+        # df = pd.DataFrame(query.data)
+        # df['time'] = pd.to_datetime(df['time'], utc=True)
+        
+        # # Get current price
+        # current_price = df.iloc[-1]['close']
+        
+        # # Get price from one year ago (closest available)
+        # one_year_ago = end_time - timedelta(days=365)
+        # year_ago_df = df[df['time'] <= one_year_ago]
+        # if len(year_ago_df) > 0:
+        #     year_ago_price = year_ago_df.iloc[-1]['close']
+        #     yoy_change = ((current_price - year_ago_price) / year_ago_price) * 100
+        # else:
+        #     year_ago_price = None
+        #     yoy_change = None
+        
+        # # Get price from one month ago (closest available)
+        # one_month_ago = end_time - timedelta(days=30)
+        # month_ago_df = df[df['time'] <= one_month_ago]
+        # if len(month_ago_df) > 0:
+        #     month_ago_price = month_ago_df.iloc[-1]['close']
+        #     mom_change = ((current_price - month_ago_price) / month_ago_price) * 100
+        # else:
+        #     month_ago_price = None
+        #     mom_change = None
+
+        # print(f"Current Price: {current_price}")
+        # print(f"Year Ago Price: {year_ago_price}")
+        # print(f"Month Ago Price: {month_ago_price}")
+        
+        # return yoy_change, mom_change, year_ago_price, month_ago_price
 
     def calculate_technical_indicators(self, df):
         df['SMA20'] = df['close'].rolling(window=20).mean()
@@ -243,7 +330,8 @@ class LiveCryptoDashboard:
                     prediction_df = self.fetch_predictions(selected_pair, days=lookback_days)
                     print('pred', prediction_df['prediction_date'].max(), prediction_df['prediction_date'].min())
                     ticker_data = self.get_ticker_data(selected_pair)
-
+                    year_ago_price, month_ago_price = self.calculate_yoy_mom_changes(selected_pair)
+                   
                     if not historical_df.empty:
                         historical_df = self.calculate_technical_indicators(historical_df)
                         print('his',historical_df['time'].max(), historical_df['time'].min())
@@ -251,35 +339,98 @@ class LiveCryptoDashboard:
                         # Display technical indicators
                         with metrics_placeholder.container():
                             latest = historical_df.iloc[-1]
-                            col1, col2, col3, col4, col5 = st.columns(5)
+                            yoy_change = (((latest['close'] - year_ago_price) / year_ago_price) * 100 if year_ago_price else None )
+                            mom_change = (((latest['close'] - month_ago_price) / month_ago_price) * 100 if month_ago_price else None)
+                            st.markdown("### Price & Volume Metrics")
+                            col1, col2, col3, col4 = st.columns(4)
+                            
+                            # Current Price
                             col1.metric(
                                 "💲 Current Price",
                                 f"${ticker_data['price']:.2f}",
                                 f"{((ticker_data['price'] - latest['open']) / latest['open']) * 100:.2f}%",
                                 help="The current price of the selected trading pair."
                             )
+                            
+                            # Volume
                             col2.metric(
                                 "📊 Volume",
                                 f"{ticker_data['volume']:.2f}",
                                 f"{((ticker_data['volume'] - historical_df['volume'].mean()) / historical_df['volume'].mean()) * 100:.2f}%",
                                 help="The trading volume compared to the 20-period average."
                             )
+                            
+                            # Daily Range
                             col3.metric(
                                 "📈 Daily Range",
                                 f"${latest['Daily_Range']:.2f}",
                                 f"Avg: ${latest['Range_SMA10']:.2f}",
                                 help="The price difference between the highest and lowest value today."
                             )
+                            
+                            # Daily Change
                             col4.metric(
+                                "📊 24h Change",
+                                f"${ticker_data['price']:.2f}",
+                                f"{((ticker_data['price'] - latest['open']) / latest['open']) * 100:.2f}%",
+                                help="Price change in the last 24 hours."
+                            )
+                            
+                            # Add some spacing between rows
+                            st.markdown("<br>", unsafe_allow_html=True)
+                            
+                            # Second Row - Technical Indicators and Historical Changes
+                            st.markdown("### Technical & Historical Metrics")
+                            col1, col2, col3, col4 = st.columns(4)
+                            
+                            # SMA
+                            col1.metric(
                                 "📏 SMA (20 Days)",
                                 f"${latest['SMA20']:.2f}",
+                                f"{((latest['SMA20'] - latest['close']) / latest['close']) * 100:.2f}%",
                                 help="Simple Moving Average over the last 20 days."
                             )
-                            col5.metric(
+                            
+                            # EMA
+                            col2.metric(
                                 "📏 EMA (20 Days)",
                                 f"${latest['EMA20']:.2f}",
+                                f"{((latest['EMA20'] - latest['close']) / latest['close']) * 100:.2f}%",
                                 help="Exponential Moving Average over the last 20 days."
                             )
+                            
+                            # YoY Change
+                            if year_ago_price is not None:
+                                col3.metric(
+                                    "📅 YoY Change",
+                                    f"${ticker_data['price']:.2f}",
+                                    f"{yoy_change:+.2f}%",
+                                    help=f"Year over Year change. Price one year ago: ${year_ago_price:.2f}"
+                                )
+                            else:
+                                col3.metric(
+                                    "📅 YoY Change",
+                                    "N/A",
+                                    "No data",
+                                    help="Insufficient historical data for YoY calculation"
+                                )
+                            
+                            # MoM Change
+                            if month_ago_price is not None:
+                                col4.metric(
+                                    "📅 MoM Change",
+                                    f"${ticker_data['price']:.2f}",
+                                    f"{mom_change:+.2f}%",
+                                    help=f"Month over Month change. Price one month ago: ${month_ago_price:.2f}"
+                                )
+                            else:
+                                col4.metric(
+                                    "📅 MoM Change",
+                                    "N/A",
+                                    "No data",
+                                    help="Insufficient historical data for MoM calculation"
+                                )
+
 
                         tab1, tab2 = st.tabs(["📈 Candlestick Chart", "🔮 Prediction Chart"])
                         timestamp_key = int(time.time()) 
