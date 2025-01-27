@@ -85,8 +85,24 @@ The following table shows the **Root Mean Square Error (RMSE)** values for each 
 This evaluation highlights the effectiveness of the LSTM model in capturing price trends for most cryptocurrencies while identifying areas for further optimization.
 
 ## Dashboard
+### **1. Prediction Chart**
 
-[Add a placeholder here for the dashboard images.]
+![Screenshot 2025-01-26 at 11 45 04 PM](https://github.com/user-attachments/assets/59dacb15-845a-46d0-994f-5f9b3d5f66c0)
+
+The Prediction chart displays **predicted values** for the next six data points, generated using the LSTM model:
+- **Markers** indicate the predicted prices at each step.
+- A **star marker** highlights the predicted price and time for the final data point (after six minutes).
+
+This setup provides both historical context and forward-looking predictions for informed decision-making.
+
+### **2. Candlestick Chart**
+![Screenshot 2025-01-26 at 11 45 27 PM](https://github.com/user-attachments/assets/6301916a-dd82-4d24-992c-5505c6751feb)
+
+The Candlestick chart visualizes historical price trends. It includes:
+- **Candlesticks** representing open, high, low, and close prices for each time period.
+- **Volume bars** at the bottom to indicate trading activity.
+
+
 
 ## How to Use
 
