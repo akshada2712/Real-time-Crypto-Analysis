@@ -1,179 +1,124 @@
-# **Real-Time Crypto Dashboard**
+# Real-Time Crypto Dashboard
 
-## **Overview**
-The **CryptoDashboard** is a real-time cryptocurrency analysis tool designed for beginners. It provides insights into cryptocurrency price movements, trends, and market patterns through an intuitive interface.
+The **Real-Time Crypto Dashboard** is a dynamic cryptocurrency analysis tool that combines real-time data visualization, predictive analytics, and market trend analysis. It integrates advanced machine learning models like LSTM (Long Short-Term Memory) to forecast cryptocurrency prices, providing users with a powerful interface for exploring and understanding market behavior.
 
-Key Features:
-- Real-time price updates and metrics.
-- Historical price analysis using candlestick charts.
-- Technical indicators like SMA (Simple Moving Average) and EMA (Exponential Moving Average).
-- Visual market sentiment analysis with price patterns.
+## Features
 
----
+- **Candlestick Chart**: Visualizes historical price data, showing open, high, low, and close prices alongside trading volume.
+- **Prediction Chart**: Displays price forecasts generated using LSTM models, helping users anticipate market trends.
+- **Technical Indicators**:
+  - **Exponential Moving Average (EMA)**: For 20 days.
+  - **Simple Moving Average (SMA)**: For 20 days.
+  - **Other Features**: High, low, open, close prices, and volume.
+
+## Folder Structure
+
+### Frontend
+- `app.py`:
+  - Streamlit-based frontend for the dashboard.
+  - Connects to Supabase to fetch and display real-time cryptocurrency data.
+
+### Data Fetcher
+- `datafetcher.py`:
+  - Contains the CoinbaseAPI class to collect live data every 15 minutes from the Coinbase Exchange API.
+  - Fetches and stores candlestick data for historical analysis.
+
+### Machine Learning
+- `cryptofeatureengineering.ipynb`:
+  - The main notebook for LSTM-based price predictions.
+  - Features used for training:
+    - High, low, open, close prices.
+    - Volume.
+    - EMA (7 and 30 days).
+    - SMA (7 and 30 days).
+  - **Error Metric**:
+    - **Root Mean Square Error (RMSE)** is used to evaluate model performance.
+
+### Backend
+- Other backend files for handling data processing and storage are hidden and not exposed.
+
+## Technical Details
+
+### LSTM Predictions
+- LSTM is a type of recurrent neural network (RNN) designed for sequence prediction.
+- It processes historical data (e.g., past 48 hours of prices) and predicts the next price.
+- Predictions are displayed alongside actual prices in the **Prediction Chart**.
+
+### Key Features in LSTM Model:
+- Input sequences of historical data (e.g., 192 timesteps for 15-minute intervals).
+- Target values are the next closing price.
+- RMSE quantifies the accuracy of predictions.
+
+## Model Evaluation
 
 
-## **How to Use**
-1. **Select Trading Pair**:
-   - Use the **dropdown menu** to choose the trading pair (e.g., BTC-USD, ETH-USD).
+The following table shows the **Root Mean Square Error (RMSE)** values for each cryptocurrency. RMSE is used to evaluate the accuracy of the LSTM predictions, with lower values indicating better performance.
 
-2. **Choose Timeframe**:
-   - Select a timeframe (e.g., Last 24 Hours, Last Week) to view historical price trends.
-
-3. **Explore Metrics**:
-   - View real-time metrics such as:
-     - **Current Price**: Latest price of the selected trading pair.
-     - **Volume**: Total volume traded during the selected period.
-     - **Daily Range**: Difference between the highest and lowest prices.
-
-4. **Analyze Charts**:
-   - Use the candlestick chart to understand historical price movements and volume trends.
-
----
-
-## **Understanding Candlestick Charts**
-
-A **candlestick chart** is a graphical representation of an asset's price movement over a specific period. Each candlestick provides:
-
-### **Candlestick Components**
-- **Open Price**: The price at the start of the period.
-- **Close Price**: The price at the end of the period.
-- **High Price**: The highest price reached during the period.
-- **Low Price**: The lowest price reached during the period.
-
-### **Candle Colors**
-- **Green Candle**: The closing price is higher than the opening price (price increase).
-- **Red Candle**: The closing price is lower than the opening price (price decrease).
-
-### **What Candlesticks Show**
-- **Price Change**: Indicates how much the price changed during the period.
-- **Lowest and Highest Prices**: The wicks (shadows) represent the high and low prices.
-
----
-
-## **Market Patterns and Sentiment**
-
-### **Price Patterns**
-- **Neutral**: Prices fluctuate within a narrow range, showing no significant trend.
-- **Bullish (Uptrend)**: A series of green candles indicates increasing prices, driven by optimism and buying pressure.
-- **Bearish (Downtrend)**: A series of red candles indicates decreasing prices, driven by pessimism and selling pressure.
-
-### **Fear and Greed Patterns**
-- **Fear**: High fear leads to bearish trends as investors sell assets.
-- **Greed**: High greed leads to bullish trends as investors buy assets.
-
----
-
-## **Data Points**
-The data for the dashboard is obtained from Coinbase Exchange APIs.
-
-### **1. Ticker Data**
-- Retrieved using the **Ticker API** to provide real-time information about the selected trading pair.
-
-#### **Key Fields**:
-| Field      | Description                                      |
-|------------|--------------------------------------------------|
-| `price`    | Current price of the cryptocurrency.             | 
-| `volume`   | Trading volume in the last 24 hours.             |
-| `bid`      | Highest price a buyer is willing to pay.         | 
-| `ask`      | Lowest price a seller is willing to accept.      |
-| `time`     | Timestamp of the latest trade (ISO format).      | 
-
-#### **Usage**:
-- **Price**: Displayed as "Current Price" in the dashboard.
-- **Volume**: Used in metrics to calculate volume change.
-- **Bid/Ask**: Provides insight into market demand.
+| Product ID      | RMSE        |
+|-----------------|-------------|
+| ADA-USD         | 0.0115      |
+| ADA-USD         | 0.0125      |
+| DOT-USD         | 0.1124      |
+| ETH-USD         | 37.8910     |
+| BAT-USD         | 0.0022      |
+| BTC-USD         | 11302.3387  |
+| DOGE-USD        | 0.0793      |
+| BTRST-USD       | 0.0255      |
+| ATOM-USD        | 0.0845      |
+| LINK-USD        | 1.1694      |
+| RAD-USD         | 0.0187      |
+| MANA-USD        | 0.0080      |
+| SUSHI-USD       | 0.0185      |
+| SOL-USD         | 10.7063     |
+| MATIC-USD       | 0.0039      |
+| REQ-USD         | 0.0010      |
+| ICP-USD         | 0.1028      |
+| XRP-USD         | 0.5542      |
 
 ---
 
-### **2. Candlestick Data**
-- Retrieved using the **Candles API** for historical price analysis.
+### **Insights:**
+- **Low RMSE**: Cryptocurrencies like `REQ-USD` (0.0010), `BAT-USD` (0.0022), and `MANA-USD` (0.0080) demonstrate highly accurate predictions.
+- **High RMSE**: `BTC-USD` shows a significantly high RMSE (11302.3387), likely due to its large price scale.
+- **Moderate RMSE**: Most altcoins, such as `DOT-USD`, `ATOM-USD`, and `XRP-USD`, show moderate prediction accuracy, with RMSE values between 0.1 and 1.0.
 
-#### **Key Fields**:
-| Field      | Description                                       | 
-|------------|---------------------------------------------------|
-| `time`     | Timestamp of the start of the candle period.      | 
-| `open`     | Opening price during the candle period.           | 
-| `high`     | Highest price during the candle period.           |
-| `low`      | Lowest price during the candle period.            | 
-| `close`    | Closing price during the candle period.           | 
-| `volume`   | Total volume traded during the candle period.     | 
+This evaluation highlights the effectiveness of the LSTM model in capturing price trends for most cryptocurrencies while identifying areas for further optimization.
 
-#### **Usage**:
-- **OHLC Data**: Plotted on candlestick charts to visualize price trends.
-- **Volume**: Shown below the candlestick chart for market activity analysis.
+## Dashboard
 
----
+[Add a placeholder here for the dashboard images.]
 
-### **3. Technical Indicators**
-- Computed from candlestick data to provide additional insights.
+## How to Use
 
-#### **Key Indicators**:
-| Indicator        | Description                                                     | 
-|------------------|-----------------------------------------------------------------|
-| `SMA20`          | Simple Moving Average over 20 periods.                          | 
-| `EMA20`          | Exponential Moving Average with more weight on recent prices.   | 
-| `Volume_SMA20`   | Moving average of volume over 20 periods.                       | 
-| `Daily_Range`    | Difference between high and low prices for a period.            | 
-| `Range_SMA10`    | Average daily range over 10 periods.                            | 
+1. **Run the App**:
+   - Dashboard Link: https://akshada2712-real-time-crypto-analysis-app-jz2woj.streamlit.app/
 
-#### **Usage**:
-- **SMA20/EMA20**: Used for analyzing price trends and momentum.
-- **Daily Range**: Highlights market volatility.
+2. **Explore the Dashboard**:
+   - Select a trading pair (e.g., BTC-USD).
+   - Choose a timeframe (e.g., Last Week) for analysis.
+   - View:
+     - **Real-time metrics**: Current price, volume, daily range.
+     - **Candlestick Chart**: Historical trends with technical indicators.
+     - **Prediction Chart**: Future price forecasts.
 
----
+3. **Analyze Results**:
+   - Leverage LSTM-based predictions to make informed decisions.
+   - Use metrics like RMSE to evaluate prediction accuracy.
 
-### **4. Products Data**
-- Retrieved using the **Products API** to provide available trading pairs.
+## Additional Information
 
-#### **Key Fields**:
-| Field             | Description                                    | Example Value |
-|-------------------|------------------------------------------------|---------------|
-| `id`              | Identifier for the trading pair.               | BTC-USD       |
-| `base_currency`   | The cryptocurrency being traded.               | BTC           |
-| `quote_currency`  | The currency used for quoting the base asset.  | USD           |
-| `status`          | Trading status of the pair (e.g., online).     | online        |
+### Key Points from UnderstandingCrypto.md
+1. **Candlestick Chart**:
+   - Open, high, low, and close prices give a complete view of market activity.
+   - Volume bars indicate trading intensity.
 
-#### **Usage**:
-- Used in the **dropdown menu** for selecting trading pairs.
+2. **Market Sentiment**:
+   - Bullish (uptrend): Price increases over time.
+   - Bearish (downtrend): Price decreases over time.
 
----
+3. **Technical Indicators**:
+   - SMA and EMA highlight trends and price momentum.
+   - Volume analysis shows periods of high and low trading activity.
 
-## **Analysis Features**
-
-### **Candlestick Chart**
-- Displays historical price trends for the selected trading pair.
-- Includes **volume bars** to show market activity.
-
-### **Technical Indicators**
-1. **Simple Moving Average (SMA20)**:
-   - Average closing price over the last 20 periods.
-   - Identifies overall trends.
-   
-2. **Exponential Moving Average (EMA20)**:
-   - A weighted moving average with emphasis on recent prices.
-   - Highlights price momentum.
-
-3. **Volume SMA20**:
-   - Average trading volume over the last 20 periods.
-   - Shows high or low trading activity trends.
-
-### **Daily Range**
-- Difference between the highest and lowest prices during the selected period.
-- Indicates market volatility.
-
-### **Real-Time Metrics**
-- **Current Price**: Latest traded price of the cryptocurrency.
-- **Volume**: Total volume traded.
-- **Price Change**: Percentage change compared to the previous period.
-
----
-
-## **Summary**
-The **CryptoDashboard** is an ideal starting point for anyone new to cryptocurrency trading. It helps users:
-- Understand market trends with candlestick charts.
-- Analyze price movements using technical indicators.
-- Recognize market sentiment and patterns like bullish and bearish trends.
-
-This tool bridges the gap for beginners looking to explore the cryptocurrency market and make informed decisions.
-
----
+4. **Data Sources**:
+   - All data is fetched from Coinbase Exchange APIs, ensuring accuracy and reliability.
