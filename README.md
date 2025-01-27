@@ -10,7 +10,7 @@ The **Real-Time Crypto Dashboard** is a dynamic cryptocurrency analysis tool tha
   - **Exponential Moving Average (EMA)**: For 20 days.
   - **Simple Moving Average (SMA)**: For 20 days.
   - **Other Features**: High, low, open, close prices, and volume.
-
+- **Note**: Timezone is in UTC.
 ## Folder Structure
 
 ### Frontend
