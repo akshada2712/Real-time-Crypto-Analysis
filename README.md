@@ -87,7 +87,27 @@ The following table shows the **Root Mean Square Error (RMSE)** values for each 
 This evaluation highlights the effectiveness of the LSTM model in capturing price trends for most cryptocurrencies while identifying areas for further optimization.
 
 ## Dashboard
-### **1. Prediction Chart**
+
+### **1. Real-Time Metrics Chart **
+
+<img width="1465" alt="Screenshot 2025-01-27 at 11 42 09 AM" src="https://github.com/user-attachments/assets/86854b5d-338c-499f-bf37-1d429c580cb2" />
+
+This Metrics Chart provides an overview of **real-time cryptocurrency metrics**, offering key insights into the selected trading pair:
+
+- **Price & Volume Metrics**:
+  - **Current Price**: Displays the latest price of the selected trading pair.
+  - **Volume**: Indicates the trading volume during the selected timeframe.
+  - **Daily Range**: Shows the price difference between the highest and lowest value in the last 24 hours.
+  - **24h Change**: Reflects the percentage change in price over the past day.
+
+- **Technical & Historical Metrics**:
+  - **SMA (20 Days)**: Simple Moving Average over the past 20 days, showing overall price trends.
+  - **EMA (20 Days)**: Exponential Moving Average over the past 20 days, focusing on recent price changes.
+  - **YoY Change**: Year-over-Year percentage change, comparing the current price with the price from the same day last year.
+  - **MoM Change**: Month-over-Month percentage change, comparing the current price with the price from the same day last month.
+
+
+### **2. Prediction Chart**
 
 ![Screenshot 2025-01-26 at 11 45 04 PM](https://github.com/user-attachments/assets/59dacb15-845a-46d0-994f-5f9b3d5f66c0)
 
@@ -97,7 +117,7 @@ The Prediction chart displays **predicted values** for the next six data points,
 
 This setup provides both historical context and forward-looking predictions for informed decision-making.
 
-### **2. Candlestick Chart**
+### **3. Candlestick Chart**
 ![Screenshot 2025-01-26 at 11 45 27 PM](https://github.com/user-attachments/assets/6301916a-dd82-4d24-992c-5505c6751feb)
 
 The Candlestick chart visualizes historical price trends. It includes:
