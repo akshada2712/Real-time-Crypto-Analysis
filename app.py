@@ -173,54 +173,7 @@ class LiveCryptoDashboard:
         print(f"Month Ago Price: {month_ago_price}")
 
         return year_ago_price, month_ago_price
-            
-        # end_time = datetime.now(timezone.utc)
-        # start_time = end_time - timedelta(days=400)  # Get more than a year of data
         
-        # query = (
-        #     self.supabase.table('coinbase_data')
-        #     .select('*')
-        #     .eq('product_id', product_id)
-        #     .gte('time', start_time.isoformat())
-        #     .lte('time', end_time.isoformat())
-        #     .order('time')
-        #     .execute()
-        # )
-        
-        # if not query.data:
-        #     return None, None, None, None
-        
-        # df = pd.DataFrame(query.data)
-        # df['time'] = pd.to_datetime(df['time'], utc=True)
-        
-        # # Get current price
-        # current_price = df.iloc[-1]['close']
-        
-        # # Get price from one year ago (closest available)
-        # one_year_ago = end_time - timedelta(days=365)
-        # year_ago_df = df[df['time'] <= one_year_ago]
-        # if len(year_ago_df) > 0:
-        #     year_ago_price = year_ago_df.iloc[-1]['close']
-        #     yoy_change = ((current_price - year_ago_price) / year_ago_price) * 100
-        # else:
-        #     year_ago_price = None
-        #     yoy_change = None
-        
-        # # Get price from one month ago (closest available)
-        # one_month_ago = end_time - timedelta(days=30)
-        # month_ago_df = df[df['time'] <= one_month_ago]
-        # if len(month_ago_df) > 0:
-        #     month_ago_price = month_ago_df.iloc[-1]['close']
-        #     mom_change = ((current_price - month_ago_price) / month_ago_price) * 100
-        # else:
-        #     month_ago_price = None
-        #     mom_change = None
-
-        # print(f"Current Price: {current_price}")
-        # print(f"Year Ago Price: {year_ago_price}")
-        # print(f"Month Ago Price: {month_ago_price}")
-        
-        # return yoy_change, mom_change, year_ago_price, month_ago_price
 
     def calculate_technical_indicators(self, df):
         df['SMA20'] = df['close'].rolling(window=20).mean()
