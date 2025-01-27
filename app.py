@@ -25,7 +25,7 @@ class LiveCryptoDashboard:
     
     def fetch_historical_data(self, product_id, days):
         """Fetch historical data for the selected trading pair."""
-        end_time = datetime.now()
+        end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=days)
         print(start_time, end_time)
         query = (
@@ -45,7 +45,7 @@ class LiveCryptoDashboard:
 
     def fetch_predictions(self, product_id, days):
         """Fetch prediction data for the selected trading pair."""
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc)
         start_time = current_time - timedelta(days=days)
         print('f',start_time, current_time)
         query = (
@@ -155,45 +155,36 @@ class LiveCryptoDashboard:
     
 
     def create_candlestick_chart(self, df, selected_pair):
-        fig = make_subplots(
-            rows=2,
-            cols=1,
-            shared_xaxes=True,
-            vertical_spacing=0.03,
-            row_heights=[0.7, 0.3],
-            subplot_titles=(f'{selected_pair} Price Chart', 'Volume')
-        )
-        fig.add_trace(
-            go.Candlestick(
-                x=df['time'],
-                open=df['open'],
-                high=df['high'],
-                low=df['low'],
-                close=df['close'],
-                name='OHLC',
-                increasing_line_color='green',
-                decreasing_line_color='red'
-            ),
-            row=1, col=1
-        )
-        volume_colors = ['green' if close > open else 'red' for close, open in zip(df['close'], df['open'])]
-        fig.add_trace(
-            go.Bar(
-                x=df['time'],
-                y=df['volume'],
-                marker_color=volume_colors,
-                name='Volume'
-            ),
-            row=2, col=1
-        )
+        fig = make_subplots(rows = 2, cols = 1, 
+                            shared_xaxes=True,
+                            vertical_spacing=0.03,
+                            row_heights=[0.7, 0.3])
+        
+        fig.add_trace(go.Candlestick(
+            x=df['time'],
+            open = df['open'],
+            high = df['high'],
+            low = df['low'],
+            close = df['close'],
+            name = 'OHLC'
+        ), 
+        row = 1, col = 1)
+        colors = ['red' if close < open else 'green' 
+                 for close, open in zip(df['close'], df['open'])]
+        
+        fig.add_trace(go.Bar(
+            x=df['time'],
+            y = df['volume'],
+            marker_color = colors,
+            name= 'Volume'
+        ),
+        row = 2, col = 1)
         fig.update_layout(
             title=f'{selected_pair} Market Analysis',
-            xaxis_title='Time',
             yaxis_title='Price',
             yaxis2_title='Volume',
             xaxis_rangeslider_visible=False,
-            height=800,
-            template='plotly_white'
+            height=800
         )
         return fig
 
@@ -205,7 +196,12 @@ class LiveCryptoDashboard:
         product_ids = self.get_products_from_database()
         trading_pairs = sorted(product_ids)
         default_index = trading_pairs.index('ETH-USD') if 'ETH-USD' in trading_pairs else 0
-        selected_pair = st.sidebar.selectbox("Select Trading Pair", trading_pairs, index=default_index)
+        selected_pair = st.sidebar.selectbox(
+                "Select Trading Pair:",
+                trading_pairs,
+                index=default_index,
+                help="Choose a cryptocurrency pair (e.g., BTC-USD) to analyze."
+            )
 
         timeframe_options = {
             "Last 24 Hours": 1,
@@ -214,7 +210,11 @@ class LiveCryptoDashboard:
             "Last 2 Weeks": 14,
             "Last Month": 30
         }
-        selected_timeframe = st.sidebar.selectbox("Select Timeframe", list(timeframe_options.keys()))
+        selected_timeframe = st.sidebar.selectbox(
+            "Select Timeframe:",
+            list(timeframe_options.keys()),
+            help="Select the historical timeframe to display (e.g., last week, last month)."
+        )
         lookback_days = timeframe_options[selected_timeframe]
 
         metrics_placeholder = st.empty()
@@ -236,54 +236,72 @@ class LiveCryptoDashboard:
         unsafe_allow_html=True
     )
         last_updated_placeholder = st.empty()
+        with st.empty():
+            while True: 
+                try:
+                    historical_df = self.fetch_historical_data(selected_pair, days=lookback_days)
+                    prediction_df = self.fetch_predictions(selected_pair, days=lookback_days)
+                    print('pred', prediction_df['prediction_date'].max(), prediction_df['prediction_date'].min())
+                    ticker_data = self.get_ticker_data(selected_pair)
 
-        while True: 
-            try:
-                historical_df = self.fetch_historical_data(selected_pair, days=lookback_days)
-                prediction_df = self.fetch_predictions(selected_pair, days=lookback_days)
-                ticker_data = self.get_ticker_data(selected_pair)
+                    if not historical_df.empty:
+                        historical_df = self.calculate_technical_indicators(historical_df)
+                        print('his',historical_df['time'].max(), historical_df['time'].min())
+                    
+                        # Display technical indicators
+                        with metrics_placeholder.container():
+                            latest = historical_df.iloc[-1]
+                            col1, col2, col3, col4, col5 = st.columns(5)
+                            col1.metric(
+                                "💲 Current Price",
+                                f"${ticker_data['price']:.2f}",
+                                f"{((ticker_data['price'] - latest['open']) / latest['open']) * 100:.2f}%",
+                                help="The current price of the selected trading pair."
+                            )
+                            col2.metric(
+                                "📊 Volume",
+                                f"{ticker_data['volume']:.2f}",
+                                f"{((ticker_data['volume'] - historical_df['volume'].mean()) / historical_df['volume'].mean()) * 100:.2f}%",
+                                help="The trading volume compared to the 20-period average."
+                            )
+                            col3.metric(
+                                "📈 Daily Range",
+                                f"${latest['Daily_Range']:.2f}",
+                                f"Avg: ${latest['Range_SMA10']:.2f}",
+                                help="The price difference between the highest and lowest value today."
+                            )
+                            col4.metric(
+                                "📏 SMA (20 Days)",
+                                f"${latest['SMA20']:.2f}",
+                                help="Simple Moving Average over the last 20 days."
+                            )
+                            col5.metric(
+                                "📏 EMA (20 Days)",
+                                f"${latest['EMA20']:.2f}",
+                                help="Exponential Moving Average over the last 20 days."
+                            )
 
-                if not historical_df.empty:
-                    historical_df = self.calculate_technical_indicators(historical_df)
+                        tab1, tab2 = st.tabs(["📈 Candlestick Chart", "🔮 Prediction Chart"])
+                        timestamp_key = int(time.time()) 
+                        # Tab 1: Candlestick Chart
+                        with tab1:
+                            candlestick_chart = self.create_candlestick_chart(historical_df, selected_pair)
+                            st.plotly_chart(candlestick_chart, use_container_width=True, key=f"candlestick_chart_{timestamp_key}")  # Use `st.plotly_chart` directly for this tab
 
-                    # Display technical indicators
-                    with metrics_placeholder.container():
-                        latest = historical_df.iloc[-1]
-                        col1, col2, col3, col4, col5 = st.columns(5)
-                        with col1:
-                            price_change = ((ticker_data['price'] - latest['open']) / latest['open']) * 100
-                            st.metric("Current Price", f"${ticker_data['price']:.2f}", f"{price_change:.2f}%")
-                        with col2:
-                            vol_change = ((ticker_data['volume'] - historical_df['volume'].mean()) / historical_df['volume'].mean())
-                            st.metric("Volume", f"{ticker_data['volume']:.2f}", f"{vol_change:.2f}%")
-                        with col3:
-                            st.metric("Daily Range", f"${latest['Daily_Range']:.2f}", f"Avg: ${latest['Range_SMA10']:.2f}")
-                        with col4:
-                            st.metric("SMA20", f"${latest['SMA20']:.2f}")
-                        with col5:
-                            st.metric("EMA20", f"${latest['EMA20']:.2f}")
+                        # Tab 2: Prediction Chart
+                        with tab2:
+                            pred_chart = self.predictions_chart(historical_df, prediction_df, selected_pair)
+                            st.plotly_chart(pred_chart, use_container_width=True, key=f"prediction_chart_{timestamp_key}")  # Use `st.plotly_chart` directly for this tab
+                    
+                        last_updated_placeholder.markdown(
+                        f"<div class='last-updated'>Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>",
+                        unsafe_allow_html=True
+                    )
+                    time.sleep(60)
 
-                    tab1, tab2 = st.tabs(["📈 Candlestick Chart", "🔮 Prediction Chart"])
-                    timestamp_key = int(time.time()) 
-                    # Tab 1: Candlestick Chart
-                    with tab1:
-                        candlestick_chart = self.create_candlestick_chart(historical_df, selected_pair)
-                        st.plotly_chart(candlestick_chart, use_container_width=True, key=f"candlestick_chart_{timestamp_key}")  # Use `st.plotly_chart` directly for this tab
-
-                    # Tab 2: Prediction Chart
-                    with tab2:
-                        pred_chart = self.predictions_chart(historical_df, prediction_df, selected_pair)
-                        st.plotly_chart(pred_chart, use_container_width=True, key=f"prediction_chart_{timestamp_key}")  # Use `st.plotly_chart` directly for this tab
-                 
-                    last_updated_placeholder.markdown(
-                    f"<div class='last-updated'>Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>",
-                    unsafe_allow_html=True
-                )
-                time.sleep(60)
-
-            except Exception as e:
-                st.error(f"Error updating dashboard: {str(e)}")
-                time.sleep(5)
+                except Exception as e:
+                    st.error(f"Error updating dashboard: {str(e)}")
+                    time.sleep(5)
 
 if __name__ == '__main__':
     dashboard = LiveCryptoDashboard()
