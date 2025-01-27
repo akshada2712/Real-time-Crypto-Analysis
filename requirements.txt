@@ -12,3 +12,4 @@ streamlit_shadcn_ui
 altair
 tensorflow
 supabase
+Flask
